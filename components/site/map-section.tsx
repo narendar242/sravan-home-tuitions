@@ -28,8 +28,8 @@ export function MapSection() {
           </div>
           <div className="aspect-[16/9] w-full sm:aspect-[21/9]">
             <iframe
-              title="Map showing Attapur, Hyderabad"
-              src="https://www.google.com/maps?q=Attapur,+Hyderabad,+Telangana&output=embed"
+              title="Map showing 9CFJ+WQ Hyderabad, Telangana"
+              src="https://www.google.com/maps?q=9CFJ%2BWQ+Hyderabad,+Telangana&output=embed"
               className="h-full w-full border-0"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"

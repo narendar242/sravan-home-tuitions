@@ -1,8 +1,8 @@
 import Image from 'next/image'
-import { CalendarCheck, CheckCircle2, Phone, Star } from 'lucide-react'
+import Link from 'next/link'
+import { CheckCircle2, GraduationCap, Star, UserPlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollReveal } from './scroll-reveal'
-import { PHONE_DISPLAY, PHONE_TEL } from './site-data'
 
 const BOARDS = ['CBSE', 'ICSE', 'State Board', 'IB', 'IGCSE']
 
@@ -25,9 +25,9 @@ export function Hero() {
         <div className="flex flex-col items-start gap-6">
           <ScrollReveal delay={80}>
             <h1 className="font-serif text-4xl font-semibold leading-[1.08] text-balance text-brand sm:text-5xl lg:text-6xl">
-              Trusted Home Tuition Services in{' '}
+              Sravan Home Tuition{' '}
               <span className="relative whitespace-nowrap text-brand">
-                Attapur
+                Services
                 <span
                   className="absolute -bottom-1 left-0 h-3 w-full rounded-full bg-gold/40"
                   aria-hidden="true"
@@ -45,19 +45,19 @@ export function Hero() {
 
           <ScrollReveal delay={240} className="flex w-full flex-col gap-3 sm:flex-row sm:items-center">
             <Button
-              render={<a href={PHONE_TEL} />}
+              render={<Link href="/join-parent" />}
               className="h-13 gap-2 rounded-full bg-brand px-7 text-base font-semibold text-brand-foreground shadow-lg shadow-brand/20 hover:bg-brand/90"
             >
-              <Phone className="size-5" />
-              Call Now
+              <UserPlus className="size-5" />
+              Join as Parent
             </Button>
             <Button
-              render={<a href="#contact" />}
+              render={<Link href="/join-tutor" />}
               variant="outline"
               className="h-13 gap-2 rounded-full border-brand/25 bg-background px-7 text-base font-semibold text-brand hover:bg-secondary"
             >
-              <CalendarCheck className="size-5" />
-              Book Free Demo Class
+              <GraduationCap className="size-5" />
+              Join as Tutor
             </Button>
           </ScrollReveal>
 

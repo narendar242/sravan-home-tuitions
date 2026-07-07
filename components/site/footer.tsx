@@ -1,14 +1,15 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import { MapPin, MessageCircle, Phone } from 'lucide-react'
 import { LOCATION, PHONE_DISPLAY, PHONE_TEL, WHATSAPP_URL } from './site-data'
 
 const QUICK_LINKS = [
-  { label: 'Home', href: '#home' },
-  { label: 'About', href: '#about' },
-  { label: 'Why Choose Us', href: '#why-choose-us' },
-  { label: 'Testimonials', href: '#testimonials' },
-  { label: 'FAQ', href: '#faq' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Home', href: '/' },
+  { label: 'About', href: '/about' },
+  { label: 'Why Choose Us', href: '/why-choose-us' },
+  { label: 'Testimonials', href: '/testimonials' },
+  { label: 'FAQ', href: '/faq' },
+  { label: 'Contact', href: '/contact' },
 ]
 
 const SERVICES = [
@@ -58,12 +59,12 @@ export function Footer() {
             <ul className="flex flex-col gap-2.5">
               {QUICK_LINKS.map((link) => (
                 <li key={link.href}>
-                  <a
+                  <Link
                     href={link.href}
                     className="text-sm text-brand-foreground/75 transition-colors hover:text-gold"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -76,12 +77,12 @@ export function Footer() {
             <ul className="flex flex-col gap-2.5">
               {SERVICES.map((service) => (
                 <li key={service}>
-                  <a
-                    href="#services"
+                  <Link
+                    href="/services"
                     className="text-sm text-brand-foreground/75 transition-colors hover:text-gold"
                   >
                     {service}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -124,12 +125,12 @@ export function Footer() {
             Copyright © 2026 Sravan Home Tuitions. All Rights Reserved.
           </p>
           <div className="flex items-center gap-5 text-sm text-brand-foreground/70">
-            <a href="#" className="transition-colors hover:text-gold">
+            <Link href="/" className="transition-colors hover:text-gold">
               Privacy Policy
-            </a>
-            <a href="#contact" className="transition-colors hover:text-gold">
+            </Link>
+            <Link href="/contact" className="transition-colors hover:text-gold">
               Contact
-            </a>
+            </Link>
           </div>
         </div>
       </div>

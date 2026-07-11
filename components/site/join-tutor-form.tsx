@@ -2,14 +2,13 @@
 
 import { useState, type FormEvent } from 'react'
 import Link from 'next/link'
-import { CheckCircle2, MessageCircle, Send, Upload } from 'lucide-react'
+import { CheckCircle2, MessageCircle, Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+
+const WHATSAPP_NUMBER = '916302267422'
 
 const fieldClass =
   'w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground shadow-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-brand focus:ring-2 focus:ring-brand/20'
-
-const fileClass =
-  'w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-muted-foreground shadow-sm outline-none transition-colors file:mr-4 file:cursor-pointer file:rounded-full file:border-0 file:bg-secondary file:px-4 file:py-1.5 file:text-sm file:font-semibold file:text-brand hover:file:bg-brand hover:file:text-brand-foreground focus:border-brand focus:ring-2 focus:ring-brand/20'
 
 function Field({
   label,
@@ -35,34 +34,43 @@ function Field({
   )
 }
 
+const FIELD_LABELS: Record<string, string> = {
+  fullName: 'Full Name',
+  mobile: 'Mobile Number',
+  email: 'Email',
+  gender: 'Gender',
+  qualification: 'Qualification',
+  experience: 'Experience',
+  subjects: 'Subjects You Teach',
+  classes: 'Classes You Teach',
+  boards: 'Boards You Teach',
+  areas: 'Preferred Teaching Areas',
+  languages: 'Languages Known',
+  timings: 'Available Timings',
+}
+
 export function JoinTutorForm() {
   const [submitted, setSubmitted] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setError(null)
-    setLoading(true)
     const form = e.currentTarget
     const data = new FormData(form)
 
-    try {
-      const res = await fetch('/api/join-tutor', {
-        method: 'POST',
-        body: data,
-      })
-      if (!res.ok) {
-        const json = await res.json().catch(() => ({}))
-        throw new Error(json.error || 'Failed to submit. Please try again.')
+    const lines = ['*New Tutor Registration*', '']
+    for (const key of Object.keys(FIELD_LABELS)) {
+      const value = (data.get(key) as string | null)?.trim()
+      if (value) {
+        lines.push(`*${FIELD_LABELS[key]}:* ${value}`)
       }
-      setSubmitted(true)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong.')
-    } finally {
-      setLoading(false)
     }
+
+    const message = encodeURIComponent(lines.join('\n'))
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`
+    window.open(url, '_blank', 'noopener,noreferrer')
+
+    setSubmitted(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   if (submitted) {
@@ -73,7 +81,8 @@ export function JoinTutorForm() {
         </span>
         <h2 className="font-serif text-2xl font-semibold text-brand">Thank you for registering.</h2>
         <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-          Our team will review your profile and contact you if you are shortlisted.
+          Your details have opened in WhatsApp. Please press send there to complete your registration, and our team
+          will contact you if you are shortlisted.
         </p>
         <div className="mt-2 w-full max-w-md rounded-2xl border border-border bg-secondary/50 p-5 text-center">
           <p className="text-sm font-medium text-brand">Join our WhatsApp community</p>
@@ -181,27 +190,19 @@ export function JoinTutorForm() {
         <Field label="Available Timings" htmlFor="timings">
           <input id="timings" name="timings" required placeholder="e.g. Weekdays 4–8 PM" className={fieldClass} />
         </Field>
-        <Field label="Upload Aadhaar Card (ID Proof)" htmlFor="aadhaar" full>
-          <input id="aadhaar" name="aadhaar" type="file" accept="image/*,application/pdf" required className={fileClass} />
-        </Field>
       </div>
 
       <div className="mt-6 flex items-start gap-2 rounded-xl bg-secondary/60 px-4 py-3 text-xs text-muted-foreground">
-        <Upload className="mt-0.5 size-4 shrink-0 text-brand" />
-        <span>Upload your Aadhaar card as an image (JPG/PNG) or PDF file.</span>
+        <MessageCircle className="mt-0.5 size-4 shrink-0 text-brand" />
+        <span>On submit, your details open in WhatsApp — just press send to complete your registration.</span>
       </div>
-
-      {error ? (
-        <p className="mt-4 rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive">{error}</p>
-      ) : null}
 
       <Button
         type="submit"
-        disabled={loading}
-        className="mt-6 h-13 w-full gap-2 rounded-full bg-brand text-base font-semibold text-brand-foreground hover:bg-brand/90 disabled:opacity-70 sm:w-auto sm:px-10"
+        className="mt-6 h-13 w-full gap-2 rounded-full bg-brand text-base font-semibold text-brand-foreground hover:bg-brand/90 sm:w-auto sm:px-10"
       >
         <Send className="size-4" />
-        {loading ? 'Submitting…' : 'Submit'}
+        Submit
       </Button>
     </form>
   )

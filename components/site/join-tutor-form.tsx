@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from 'react'
 import Link from 'next/link'
-import { CheckCircle2, Send, Upload } from 'lucide-react'
+import { CheckCircle2, MessageCircle, Send, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 const fieldClass =
@@ -37,35 +37,32 @@ function Field({
 
 export function JoinTutorForm() {
   const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    setError(null)
+    setLoading(true)
     const form = e.currentTarget
     const data = new FormData(form)
-    const get = (name: string) => (data.get(name) as string)?.trim() || '—'
 
-    const message = [
-      '*New Tutor Registration — Sravan Home Tuitions*',
-      '',
-      `Full Name: ${get('fullName')}`,
-      `Mobile: ${get('mobile')}`,
-      `Email: ${get('email')}`,
-      `Gender: ${get('gender')}`,
-      `Qualification: ${get('qualification')}`,
-      `Experience: ${get('experience')}`,
-      `Subjects: ${get('subjects')}`,
-      `Classes: ${get('classes')}`,
-      `Boards: ${get('boards')}`,
-      `Preferred Areas: ${get('areas')}`,
-      `Languages: ${get('languages')}`,
-      `Available Timings: ${get('timings')}`,
-      '',
-      '(Resume, ID proof and photo will be shared in this chat.)',
-    ].join('\n')
-
-    window.open(`https://wa.me/916302267422?text=${encodeURIComponent(message)}`, '_blank')
-    setSubmitted(true)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    try {
+      const res = await fetch('/api/join-tutor', {
+        method: 'POST',
+        body: data,
+      })
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}))
+        throw new Error(json.error || 'Failed to submit. Please try again.')
+      }
+      setSubmitted(true)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (submitted) {
@@ -78,9 +75,29 @@ export function JoinTutorForm() {
         <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
           Our team will review your profile and contact you if you are shortlisted.
         </p>
+        <div className="mt-2 w-full max-w-md rounded-2xl border border-border bg-secondary/50 p-5 text-center">
+          <p className="text-sm font-medium text-brand">Join our WhatsApp community</p>
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+            Connect with us and get the latest tuition updates and openings.
+          </p>
+          <Button
+            render={
+              <a
+                href="https://chat.whatsapp.com/KkzbVm4Jfn5KiKbjeeKQ4v"
+                target="_blank"
+                rel="noopener noreferrer"
+              />
+            }
+            className="mt-3 h-11 w-full gap-2 rounded-full bg-brand px-6 text-sm font-semibold text-brand-foreground hover:bg-brand/90"
+          >
+            <MessageCircle className="size-4" />
+            Join WhatsApp Community
+          </Button>
+        </div>
         <Button
           render={<Link href="/" />}
-          className="mt-2 h-11 rounded-full bg-brand px-6 text-sm font-semibold text-brand-foreground hover:bg-brand/90"
+          variant="outline"
+          className="h-11 rounded-full px-6 text-sm font-semibold"
         >
           Back to Home
         </Button>
@@ -93,6 +110,33 @@ export function JoinTutorForm() {
       onSubmit={handleSubmit}
       className="rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8"
     >
+      <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-border bg-secondary/50 p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3">
+          <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-brand/10 text-brand">
+            <MessageCircle className="size-5" />
+          </span>
+          <div>
+            <p className="text-sm font-semibold text-brand">Join my WhatsApp community</p>
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              Follow this link to join and get the latest tuition updates and openings.
+            </p>
+          </div>
+        </div>
+        <Button
+          render={
+            <a
+              href="https://chat.whatsapp.com/KkzbVm4Jfn5KiKbjeeKQ4v"
+              target="_blank"
+              rel="noopener noreferrer"
+            />
+          }
+          className="h-11 shrink-0 gap-2 rounded-full bg-brand px-6 text-sm font-semibold text-brand-foreground hover:bg-brand/90"
+        >
+          <MessageCircle className="size-4" />
+          Join Community
+        </Button>
+      </div>
+
       <div className="grid gap-5 sm:grid-cols-2">
         <Field label="Full Name" htmlFor="fullName">
           <input id="fullName" name="fullName" required placeholder="Your full name" className={fieldClass} />
@@ -137,28 +181,27 @@ export function JoinTutorForm() {
         <Field label="Available Timings" htmlFor="timings">
           <input id="timings" name="timings" required placeholder="e.g. Weekdays 4–8 PM" className={fieldClass} />
         </Field>
-        <Field label="Upload Resume" htmlFor="resume">
-          <input id="resume" name="resume" type="file" accept=".pdf,.doc,.docx" required className={fileClass} />
-        </Field>
-        <Field label="Upload ID Proof" htmlFor="idProof">
-          <input id="idProof" name="idProof" type="file" accept="image/*,.pdf" required className={fileClass} />
-        </Field>
-        <Field label="Upload Photo" htmlFor="photo">
-          <input id="photo" name="photo" type="file" accept="image/*" required className={fileClass} />
+        <Field label="Upload Aadhaar Card (ID Proof)" htmlFor="aadhaar" full>
+          <input id="aadhaar" name="aadhaar" type="file" accept="image/*,application/pdf" required className={fileClass} />
         </Field>
       </div>
 
       <div className="mt-6 flex items-start gap-2 rounded-xl bg-secondary/60 px-4 py-3 text-xs text-muted-foreground">
         <Upload className="mt-0.5 size-4 shrink-0 text-brand" />
-        <span>Accepted files: Resume (PDF/DOC), ID Proof (Image/PDF) and Photo (Image).</span>
+        <span>Upload your Aadhaar card as an image (JPG/PNG) or PDF file.</span>
       </div>
+
+      {error ? (
+        <p className="mt-4 rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive">{error}</p>
+      ) : null}
 
       <Button
         type="submit"
-        className="mt-6 h-13 w-full gap-2 rounded-full bg-brand text-base font-semibold text-brand-foreground hover:bg-brand/90 sm:w-auto sm:px-10"
+        disabled={loading}
+        className="mt-6 h-13 w-full gap-2 rounded-full bg-brand text-base font-semibold text-brand-foreground hover:bg-brand/90 disabled:opacity-70 sm:w-auto sm:px-10"
       >
         <Send className="size-4" />
-        Submit
+        {loading ? 'Submitting…' : 'Submit'}
       </Button>
     </form>
   )
